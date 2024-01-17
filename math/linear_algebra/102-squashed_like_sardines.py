@@ -3,7 +3,6 @@
 Module that concatenates two matrices
 """
 
-
 def matrix_shape(matrix):
     """
         Get the matrix shape
