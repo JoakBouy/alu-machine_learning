@@ -29,7 +29,7 @@ class Normal:
             self.mean = sum(data) / len(data)
             self.stddev = sum(map(lambda i: (i - self.mean) ** 2, data))
             self.stddev = (self.stddev / len(data)) ** (1 / 2)
-            
+
     def z_score(self, x):
         """
         z-score of a given x-score
@@ -41,7 +41,7 @@ class Normal:
         x-score of a given z-score
         """
         return z * self.stddev + self.mean
-    
+
     def pdf(self, x):
         """
         Probability Density Function for normal
