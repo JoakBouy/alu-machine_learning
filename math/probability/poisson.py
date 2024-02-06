@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+import math 
+
 class Poisson:
     """
     Represents a Poisson distribution.
