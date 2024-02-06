@@ -1,7 +1,11 @@
-#!/usr/bin/env python3
-"""
-Representing poisson distribution
-"""
+class Poisson:
+    """
+    Represents a Poisson distribution.
+    
+    Attributes:
+        lambtha: The expected number of occurrences in a given time frame.
+    """
+
 
 class Poisson:
     def __init__(self, data=None, lambtha=1.):
@@ -17,3 +21,10 @@ class Poisson:
                 raise ValueError("data must contain multiple values")
             else:
                 self.lambtha = float(sum(data) / len(data))
+
+    def pmf(self, k):
+        if k < 0:
+            return 0
+        k = int(k)
+        e = math.exp(-self.lambtha)
+        return e * self.lambtha**k / math.factorial(k)
