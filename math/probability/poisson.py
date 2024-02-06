@@ -25,9 +25,23 @@ class Poisson:
             else:
                 self.lambtha = float(sum(data) / len(data))
 
+    def factorial(self, n):
+        fact = 1
+        for i in range(1, n + 1):
+            fact *= i
+        return fact
+
+    def exp(self, x):
+        n, term, sum = 0, 1, 1
+        while abs(term) > 1e-10:
+            n += 1
+            term *= x / n
+            sum += term
+        return sum
+
     def pmf(self, k):
         if k < 0:
             return 0
         k = int(k)
-        e = math.exp(-self.lambtha)
-        return e * self.lambtha**k / math.factorial(k)
+        e = self.exp(-self.lambtha)
+        return e * self.lambtha**k / self.factorial(k)
