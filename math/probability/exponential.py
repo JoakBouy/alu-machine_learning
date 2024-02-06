@@ -25,3 +25,12 @@ class Exponential:
             if len(data) < 2:
                 raise ValueError("data must contain multiple values")
             self.lambtha = 1 / (sum(data) / len(data))
+    
+        def pdf(self, x):
+            """
+            Probability Density Function for exponential
+            """
+            if x < 0:
+                return 0
+            pdf = self.lambtha * Exponential.e ** - (self.lambtha * x)
+            return pdf
