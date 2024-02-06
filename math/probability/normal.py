@@ -60,4 +60,3 @@ class Normal:
         erf2 = (val - (val**3)/3 + (val**5)/10 - (val**7)/42 + (val**9)/216)
         cdf = (1 / 2) * (1 + erf1 * erf2)
         return cdf
-    
