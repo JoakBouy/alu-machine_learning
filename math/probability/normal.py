@@ -41,3 +41,12 @@ class Normal:
         x-score of a given z-score
         """
         return z * self.stddev + self.mean
+    
+    def pdf(self, x):
+        """
+        Probability Density Function for normal
+        """
+        exponent = (- 1 / 2) * (((x - self.mean) / self.stddev) ** 2)
+        coeficient = 1 / (self.stddev * (2 * Normal.pi) ** (1 / 2))
+        pdf = coeficient * Normal.e ** exponent
+        return pdf
