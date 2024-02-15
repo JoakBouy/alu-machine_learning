@@ -1,3 +1,4 @@
+#usr/env/bin python3
 import numpy as np
 
 def convolve_grayscale_padding(images, kernel, padding):
