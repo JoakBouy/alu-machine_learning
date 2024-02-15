@@ -4,10 +4,10 @@ Performs a strided convolution on images with channels
 """
 import numpy as np
 
-
 def convolve_channels(images, kernel, padding='same', stride=(1, 1)):
     """
-    a function that performs a convolution with channels
+    Performs a strided convolution on images with channels
+
     :param images: a numpy.ndarray with shape (m, h, w, c) containing multiple
     grayscale images
         m is the number of images
@@ -26,32 +26,22 @@ def convolve_channels(images, kernel, padding='same', stride=(1, 1)):
         sw is the stride for the width of the image
     :return: numpy.ndarray containing the convolved images
     """
-    c_images, images_h, images_w, _ = images.shape
-    f_height = kernel.shape[0]
-    f_width = kernel.shape[1]
-    stride_h, stride_w = stride
+    # Determine the output shape based on the input shape, kernel shape, padding, and stride
+    output_height = (images.shape[1] + 2 * padding[0] - kernel.shape[0]) // stride[0] + 1
+    output_width = (images.shape[2] + 2 * padding[1] - kernel.shape[1]) // stride[1] + 1
 
-    if padding == "same":
-        padding_h = ((images_h - 1) * stride_h + f_height - images_h) // 2 + 1
-        padding_w = ((images_w - 1) * stride_w + f_width - images_w) // 2 + 1
-    elif padding == "valid":
-        padding_h, padding_w = (0, 0)
-    else:
-        padding_h, padding_w = padding
+    # Initialize the output array with zeros
+    convolved = np.zeros((images.shape[0], output_height, output_width))
 
-    c_height = (images.shape[1] + 2 * padding_h - f_height) // stride_h + 1
-    c_width = (images.shape[2] + 2 * padding_w - f_width) // stride_w + 1
-    # np.pad works with a before_N and after_N parameter defined in a tuple
-    # that will add the selected pad at each dimension
-    pad_images = np.pad(images, ((0, 0), (padding_h, padding_h), (padding_w,
-                                                                  padding_w),
-                                 (0, 0)))
+    # Loop over the output pixels and compute the convolution
+    for i in range(output_height):
+        for j in range(output_width):
+            # Extract the input patch centered at the current output pixel
+            patch = images[:, i*stride[0]:i*stride[0]+kernel.shape[0],
+                          j*stride[1]:j*stride[1]+kernel.shape[1]]
 
-    convolved = np.zeros((c_images, c_height, c_width))
-    for row in range(c_height):
-        for col in range(c_width):
-            pad_ele = pad_images[:, row * stride_h:row * stride_h + f_height,
-                                 col * stride_w:col * stride_w + f_width]
-            sum_mul_ele = np.sum(pad_ele * kernel, axis=(1, 2, 3))
-            convolved[:, row, col] = sum_mul_ele
+            # Compute the convolution by summing over the spatial dimensions and the channel dimension
+            convolved[:, i, j] = np.sum(patch * kernel, axis=(1, 2, 3))
+
+    # Return the convolved images
     return convolved
