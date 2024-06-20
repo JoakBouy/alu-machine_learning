@@ -1,68 +1,54 @@
 #!/usr/bin/env python3
 """
-Module to create a deep neural network
+Deep Neural Network Class
 """
+
+
 import numpy as np
 
 
 class DeepNeuralNetwork:
     """
-    A class that defines a deep neural network with one hidden layer performing
-    binary classification
+    A class that  represents a deep neural network.
     """
-
     def __init__(self, nx, layers):
-        """
-        class constructor
-        :param nx: is the number of input features to the neuron
-        :param layers: a list representing the number of nodes in each layer
-        """
-        if type(nx) is not int:
-            raise TypeError("nx must be an integer")
+        if type(nx) != int:
+            raise TypeError('nx must be an integer')
         if nx < 1:
-            raise ValueError("nx must be a positive integer")
-        self.nx = nx
-        if type(layers) is not list or len(layers) == 0:
-            raise TypeError("layers must be a list of positive integers")
-        # L is the number of layers in the neural network
-        self.__L = len(layers)
-        # cache is a dictionary to hold all intermediary values of the network
-        self.__cache = {}
-        # weights is a dictionary to hold all weighs and biased of the network
-        weights = {}
-        for i in range(len(layers)):
-            if layers[i] < 1:
-                raise TypeError("layers must be a list of positive integers")
-            key_w = 'W' + str(i + 1)
-            key_b = 'b' + str(i + 1)
-            if i == 0:
-                weights[key_w] = np.random.randn(layers[i], nx)*np.sqrt(2 / nx)
-            else:
-                weights[key_w] = np.random.randn(layers[i], layers[
-                    i-1]) * np.sqrt(2 / layers[i-1])
-            weights[key_b] = np.zeros((layers[i], 1))
-        self.__weights = weights
+            raise ValueError('nx must be a positive integer')
+        if type(layers) != list:
+            raise TypeError('layers must be a list of positive integers')
+        if len(layers) < 1:
+            raise TypeError('layers must be a list of positive integers')
 
-    @property
-    def cache(self):
-        """
-        attribute getter for cache
-        :return: cache
-        """
-        return self.__cache
+        self.__L = len(layers)
+        self.__cache = {}
+        self.__weights = {}
+
+        for i in range(self.__L):
+            if not isinstance(layers[i], int) or layers[i] < 1:
+                raise TypeError('layers must be a list of positive integers')
+
+            if i == 0:
+                # He et al. initialization
+                self.__weights['W' + str(i + 1)] = np.random.randn(
+                    layers[i], nx) * np.sqrt(2 / nx)
+            else:
+                # He et al. initialization
+                self.__weights['W' + str(i + 1)] = np.random.randn(
+                    layers[i], layers[i - 1]) * np.sqrt(2 / layers[i - 1])
+
+            # Zero initialization
+            self.__weights['b' + str(i + 1)] = np.zeros((layers[i], 1))
 
     @property
     def L(self):
-        """
-        attribute getter for L (number of layers)
-        :return: L
-        """
         return self.__L
 
     @property
+    def cache(self):
+        return self.__cache
+
+    @property
     def weights(self):
-        """
-        attribute getter for weights
-        :return: weights
-        """
         return self.__weights
