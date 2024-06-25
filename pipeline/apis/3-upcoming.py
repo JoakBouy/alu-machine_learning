@@ -1,27 +1,34 @@
 #!/usr/bin/env python3
-""" Script for getting SpaceX launch info"""
+"""
+Displays the upcoming launch information
+"""
 import requests
 
-
 if __name__ == '__main__':
-    url = 'https://api.spacexdata.com/v4/launches/upcoming'
-    response = requests.get(url).json()
-    date = [x['date_unix'] for x in response]
-    idx = date.index(min(date))
-    launch = response[idx]
-    launch_name = launch['name']
-    date_l = launch['date_local']
-    rocket_id = launch['rocket']
-    rocket_url = "https://api.spacexdata.com/v4/rockets/{}".format(rocket_id)
-    rocket_name = requests.get(rocket_url).json()['name']
-    lpad_id = launch['launchpad']
-    lpad_url = "https://api.spacexdata.com/v4/launchpads/{}".format(lpad_id)
-    lpad_req = requests.get(lpad_url).json()
-    lpad_name = lpad_req.get('name', 'Unknown Launchpad')
-    lpad_loc = lpad_req.get('locality', 'Unknown Locality')
+    url = "https://api.spacexdata.com/v4/launches/upcoming"
+    r = requests.get(url)
+    json = r.json()
 
-    upcoming_launch = "{} ({}) {} - {} ({})".format(launch_name, date_l,
-                                                    rocket_name, lpad_name,
-                                                    lpad_loc)
+    dates = [x['date_unix'] for x in json]
+    index = dates.index(min(dates))
+    next_launch = json[index]
 
-    print(upcoming_launch)
+    name = next_launch['name']
+    date = next_launch['date_local']
+    rocket_id = next_launch['rocket']
+    launchpad_id = next_launch['launchpad']
+
+    url_r = "https://api.spacexdata.com/v4/rockets/" + rocket_id
+    req_r = requests.get(url_r)
+    json_r = req_r.json()
+    rocket_name = json_r['name']
+
+    url_l = "https://api.spacexdata.com/v4/launchpads/" + launchpad_id
+    req_l = requests.get(url_l)
+    json_l = req_l.json()
+    launchpad_name = json_l['name']
+    launchpad_loc = json_l['locality']
+
+    info = (name + ' (' + date + ') ' + rocket_name + ' - ' +
+            launchpad_name + ' (' + launchpad_loc + ')')
+    print(info)
