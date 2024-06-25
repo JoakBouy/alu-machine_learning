@@ -1,33 +1,22 @@
 #!/usr/bin/env python3
-"""
-Displays the number of launches per rocket
-"""
+"""Pipeline Api"""
 import requests
 
 
 if __name__ == '__main__':
-
-    rockets = {}
-
-    url = 'https://api.spacexdata.com/v4/launches'
+    """pipeline api"""
+    url = "https://api.spacexdata.com/v4/launches"
     r = requests.get(url)
-    launches = r.json()
+    rocket_dict = {"5e9d0d95eda69955f709d1eb": 0}
 
-    for launch in launches:
-        rocket_id = launch['rocket']
-        url_r = "https://api.spacexdata.com/v4/rockets/{}".\
-            format(rocket_id)
-        req_r = requests.get(url_r)
-        json_r = req_r.json()
-        rocket_name = json_r['name']
-
-        if rocket_name in rockets.keys():
-            rockets[rocket_name] += 1
+    for launch in r.json():
+        if launch["rocket"] in rocket_dict:
+            rocket_dict[launch["rocket"]] += 1
         else:
-            rockets[rocket_name] = 1
+            rocket_dict[launch["rocket"]] = 1
+    for key, value in sorted(rocket_dict.items(),
+                             key=lambda kv: kv[1], reverse=True):
+        rurl = "https://api.spacexdata.com/v4/rockets/" + key
+        req = requests.get(rurl)
 
-    sort = sorted(rockets.items(), key=lambda x: x[0])
-    sort = sorted(sort, key=lambda x: x[1], reverse=True)
-
-    for i in sort:
-        print("{}: {}".format(i[0], i[1]))
+        print(req.json()["name"] + ": " + str(value))
