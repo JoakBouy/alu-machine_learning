@@ -1,33 +1,33 @@
 #!/usr/bin/env python3
-"""
-Displays the number of launches per rocket
-"""
+'''
+Get rocket names from launch details
+'''
+
+
 import requests
+from collections import defaultdict
+
+
+def get_rocket_name():
+    '''return rockets with their num of launches'''
+    url = 'https://api.spacexdata.com/v4/launches'
+    response = requests.get(url)
+    rockets = defaultdict(int)
+    for launch in response.json():
+        rockets[launch['rocket']] += 1
+
+    names = defaultdict(str)
+
+    for rocket in rockets:
+        url = 'https://api.spacexdata.com/v4/rockets/{}'.format(rocket)
+        response = requests.get(url)
+        names[rocket] = response.json().get('name', 'Unknown rocket')
+
+    # Print rocket names with the number of launches in decreasing order
+    sorted_rockets = sorted(rockets.items(), key=lambda x: x[1], reverse=True)
+    for rocket, count in sorted_rockets:
+        print('{}: {}'.format(names.get(rocket, 'Unknown rocket'), count))
 
 
 if __name__ == '__main__':
-
-    rockets = {}
-
-    url = 'https://api.spacexdata.com/v4/launches'
-    r = requests.get(url)
-    launches = r.json()
-
-    for launch in launches:
-        rocket_id = launch['rocket']
-        url_r = "https://api.spacexdata.com/v4/rockets/{}".\
-            format(rocket_id)
-        req_r = requests.get(url_r)
-        json_r = req_r.json()
-        rocket_name = json_r['name']
-
-        if rocket_name in rockets.keys():
-            rockets[rocket_name] += 1
-        else:
-            rockets[rocket_name] = 1
-
-    sort = sorted(rockets.items(), key=lambda x: x[0])
-    sort = sorted(sort, key=lambda x: x[1], reverse=True)
-
-    for i in sort:
-        print("{}: {}".format(i[0], i[1]))
+    get_rocket_name()
