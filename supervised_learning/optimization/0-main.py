@@ -10,5 +10,6 @@ if __name__ == '__main__':
     c = np.random.normal(-3, 10, size=(100, 1))
     X = np.concatenate((a, b, c), axis=1)
     m, s = normalization_constants(X)
+    print(X)
     print(m)
     print(s)

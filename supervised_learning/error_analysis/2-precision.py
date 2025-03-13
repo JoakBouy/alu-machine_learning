@@ -1,19 +1,22 @@
 #!/usr/bin/env python3
-""" Precision
-"""
+""" Calculate Precision """
 
 import numpy as np
 
 
 def precision(confusion):
-    """ calculates the precision for each class in a confusion matrix
+    """
+    Calculates the precision for each class in a confusion matrix.
 
-    Args:
-        confusion (classes, classes): confusion matrix where row indices
-        represent the correct labels and column indices represent the
-        predicted labels
+    Parameters:
+    - confusion: is a confusion numpy.ndarray of shape (classes, classes) where
+      row indices represent the correct labels and column indices represent the
+      predicted labels
 
     Returns:
-        (classes,): precision of each class
+    A numpy.ndarray of shape (classes,) containing the precision of each class.
     """
-    return np.diag(confusion) / np.sum(confusion, axis=0)
+    true_positives = np.diag(confusion)
+    false_positives = np.sum(confusion, axis=0) - true_positives
+    precision = true_positives / (true_positives + false_positives)
+    return precision

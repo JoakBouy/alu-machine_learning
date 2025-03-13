@@ -68,6 +68,10 @@ class DeepNeuralNetwork:
 
     def forward_prop(self, X):
         """ Forward propagation
+
+        Args:
+            X (numpy.array): Input array with
+            shape (nx, m) = (features, no of examples)
         """
         self.cache["A0"] = X
         for i in range(1, self.L+1):
@@ -87,12 +91,29 @@ class DeepNeuralNetwork:
 
     def cost(self, Y, A):
         """ Calculate the cost of the Neural Network \
+            using categorical cross-entropy.
+
+        Args:
+            Y (numpy.array): Actual one-hot encoded \
+                labels with shape (classes, m)
+            A (numpy.array): Predicted probabilities \
+                from the output layer of the neural network
+
+        Returns:
+            float: Categorical cross-entropy cost
         """
         cost = -np.sum(Y * np.log(A)) / Y.shape[1]
         return cost
 
     def evaluate(self, X, Y):
         """ Evaluate the neural network
+
+        Args:
+            X (numpy.array): Input array
+            Y (numpy.array): Actual one-hot encoded labels
+
+        Returns:
+            prediction, cost: return predictions and costs
         """
         self.forward_prop(X)
         # get output of the neural network from the cache
@@ -104,6 +125,12 @@ class DeepNeuralNetwork:
 
     def gradient_descent(self, Y, cache, alpha=0.05):
         """ Calculate one pass of gradient descent on the neural network
+
+        Args:
+            Y (numpy.array): Actual values
+            cache (dict): Dictionary containing all intermediary values of the
+                          network
+            alpha (float): learning rate
         """
         m = Y.shape[1]
 
@@ -126,6 +153,24 @@ class DeepNeuralNetwork:
     def train(self, X, Y, iterations=5000,
               alpha=0.05, verbose=True, graph=True, step=100):
         """ Train the deep neural network
+
+        Args:
+            X (_type_): _description_
+            Y (_type_): _description_
+            iterations (int, optional): _description_. Defaults to 5000.
+            alpha (float, optional): _description_. Defaults to 0.05.
+            verbose (bool, optional): _description_. Defaults to True.
+            graph (bool, optional): _description_. Defaults to True.
+            step (int, optional): _description_. Defaults to 100.
+
+        Raises:
+            TypeError: _description_
+            ValueError: _description_
+            TypeError: _description_
+            ValueError: _description_
+
+        Returns:
+            _type_: _description_
         """
 
         if not isinstance(iterations, int):
@@ -156,6 +201,9 @@ class DeepNeuralNetwork:
 
     def save(self, filename):
         """ Save the instance object to a file in pickle format
+
+        Args:
+            filename (_type_): _description_
         """
         if not filename.endswith(".pkl"):
             filename += ".pkl"
@@ -165,6 +213,12 @@ class DeepNeuralNetwork:
     @staticmethod
     def load(filename):
         """ Load a pickled DeepNeuralNetwork object
+
+        Args:
+            filename (_type_): _description_
+
+        Returns:
+            _type_: _description_
         """
         try:
             with open(filename, 'rb') as f:

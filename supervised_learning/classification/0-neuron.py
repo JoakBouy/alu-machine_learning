@@ -1,25 +1,30 @@
 #!/usr/bin/env python3
+"""Class Neuron that defines a single neuron performing binary classification
 """
-Module to create a neuron
-"""
+
+
 import numpy as np
 
 
 class Neuron:
-    """
-    A class that defines a single neuron
+    """ Class Neuron
     """
 
     def __init__(self, nx):
+        """ Instantiation function of the neuron
+
+        Args:
+            nx (_type_): _description_
+
+        Raises:
+            TypeError: _description_
+            ValueError: _description_
         """
-        class constructor
-        :param nx: is the number of input features to the neuron
-        """
-        if type(nx) is not int:
-            raise TypeError("nx must be an integer")
+        if not isinstance(nx, int):
+            raise TypeError('nx must be an integer')
         if nx < 1:
-            raise ValueError("nx must be a positive integer")
-        self.nx = nx
-        self.W = np.random.randn(1, nx)
+            raise ValueError('nx must be a positive integer')
+
+        self.W = np.random.normal(size=(1, nx))
         self.b = 0
         self.A = 0

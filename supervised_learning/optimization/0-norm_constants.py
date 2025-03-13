@@ -1,15 +1,16 @@
 #!/usr/bin/env python3
-'''
-optimiozation
-'''
+""" Normalization Constants"""
 
 import numpy as np
 
 
 def normalization_constants(X):
-    '''
-    return the mean and standard deviation
-    '''
-    mean = np.mean(X, axis=0)
-    std = np.std(X, axis=0)
-    return (mean, std)
+    """ Normalization Constants
+
+    Args:
+        X (_type_): _description_
+    Returns:
+        _type_: _description_
+    """
+
+    return X.mean(axis=0), X.std(axis=0)

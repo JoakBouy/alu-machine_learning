@@ -1,16 +1,18 @@
 #!/usr/bin/env python3
+"""Class Neuron that defines a single neuron performing binary classification
 """
-Module to create a placeholder
-"""
+
+
 import tensorflow as tf
 
 
 def create_placeholders(nx, classes):
+    """Function that returns two placeholders, x and y, for the neural network
+
+    Args:
+        nx (_type_): _description_
+        classes (_type_): _description_
     """
-    a function that create placeholders
-    :param nx: the number of feature columns in our data
-    :param classes: the number of classes in our classifier
-    :return: placeholders named x and y, respectively
-    """
-    return tf.placeholder(float, shape=[None, nx], name='x'), tf.placeholder(
-        float, shape=[None, classes], name='y')
+    x = tf.placeholder("float", shape=[None, nx], name="x")
+    y = tf.placeholder("float", shape=[None, classes], name="y")
+    return x, y

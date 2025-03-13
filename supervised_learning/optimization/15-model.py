@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
-"""This script is designed to create and train a model based on multiple-object
-optimization theory."""
+"""Script to train a model with a multiple-object
+    optimization theory
+"""
 
 
 import numpy as np
@@ -8,7 +9,14 @@ import tensorflow as tf
 
 
 def shuffle_data(X, Y):
-    """This function shuffles data within matrices."""
+    """
+    Function to shuffle data in a matrix
+    Args:
+        X: numpy.ndarray of shape (m, nx) to shuffle
+        Y: numpy.ndarray of shape (m, ny) to shuffle
+    Returns: the shuffled X and Y matrices
+
+    """
     m = X.shape[0]
     shuffle = np.random.permutation(m)
     X_shuffled = X[shuffle]
@@ -17,20 +25,48 @@ def shuffle_data(X, Y):
 
 
 def calculate_loss(y, y_pred):
-    """This method calculates the loss of a prediction."""
+    """
+    Method to calculate the cross-entropy loss
+    of a prediction
+    Args:
+        y: input data type label in a placeholder
+        y_pred: type tensor that contains the DNN prediction
+
+    Returns:
+
+    """
     loss = tf.losses.softmax_cross_entropy(y, y_pred)
     return loss
 
 
 def calculate_accuracy(y, y_pred):
-    """This method calculates the accuracy of a prediction in a DNN."""
+    """
+    method to calculate the accuracy of a prediction in a DNN
+    Args:
+        y: input data type label in a placeholder
+        y_pred: type tensor that contains the DNN prediction
+
+    Returns: Prediction accuracy
+
+    """
     correct_prediction = tf.equal(tf.argmax(y, 1), tf.argmax(y_pred, 1))
     accuracy = tf.reduce_mean(tf.cast(correct_prediction, tf.float32))
+
     return accuracy
 
 
 def create_layer(prev, n, activation):
-    """This method creates a TensorFlow layer."""
+    """
+    method to create a TF layer
+    Args:
+        prev: tensor of the previous layer
+        n: n nodes created
+        activation: activation function
+
+    Returns: Layer created with shape n
+
+    """
+    # Average number of inputs and output connections.
     initializer = tf.contrib.layers.variance_scaling_initializer(
         mode="FAN_AVG"
     )
@@ -42,7 +78,17 @@ def create_layer(prev, n, activation):
 
 
 def create_batch_norm_layer(prev, n, activation):
-    """This function normalizes a batch in a DNN with TensorFlow."""
+    """
+    Function that normalized a batch in a DNN with Tf
+    Args:
+        prev: the activated output of the previous layer
+        n: number of nodes in the layer to be created
+        activation: activation function that should be used
+                    on the output of the layer
+
+    Returns: tensor of the activated output for the layer
+
+    """
     init = tf.contrib.layers.variance_scaling_initializer(mode="FAN_AVG")
     x = tf.layers.Dense(units=n, kernel_initializer=init)
     x_prev = x(prev)
@@ -65,7 +111,16 @@ def create_batch_norm_layer(prev, n, activation):
 
 
 def forward_prop(x, layer_sizes=[], activations=[]):
-    """This method performs forward propagation using TensorFlow."""
+    """
+    Forward propagation method using TF
+    Args:
+        x: Input data (placeholder)
+        layer_sizes: type list are the n nodes inside the layers
+        activations: type list with the activation function per layer
+
+    Returns: Prediction of a DNN
+
+    """
     layer = create_batch_norm_layer(x, layer_sizes[0], activations[0])
     for i in range(1, len(layer_sizes)):
         if i != len(layer_sizes) - 1:
@@ -78,7 +133,18 @@ def forward_prop(x, layer_sizes=[], activations=[]):
 
 
 def create_Adam_op(loss, alpha, beta1, beta2, epsilon):
-    """This function trains a DNN with TensorFlow RMSProp optimization."""
+    """
+    Function to train a DNN with TF RMSProp optimization
+    Args:
+        loss: loss of the network
+        alpha: learning rate
+        beta1: weight used for the first moment
+        beta2: weight used for the second moment
+        epsilon: small number to avoid division by zero
+
+    Returns: Adam optimization operation
+
+    """
     optimizer = tf.train.AdamOptimizer(
         alpha, beta1, beta2, epsilon
     ).minimize(loss)
@@ -86,8 +152,18 @@ def create_Adam_op(loss, alpha, beta1, beta2, epsilon):
 
 
 def learning_rate_decay(alpha, decay_rate, global_step, decay_step):
-    """This function performs learning rate
-    decay in TensorFlow using inverse time decay."""
+    """
+    learning rate decay operation in tensorflow using inverse time decay:
+    Args:
+        alpha: original learning rate
+        decay_rate: weight used to determine the rate at which alpha will decay
+        global_step: number of passes of gradient descent that have elapsed
+        decay_step: number of passes of gradient descent that should occur
+                    before alpha is decayed further
+
+    Returns:  learning rate decay operation
+
+    """
     LRD = tf.train.inverse_time_decay(
         alpha, global_step, decay_step, decay_rate, staircase=True
     )
@@ -108,7 +184,29 @@ def model(
     epochs=5,
     save_path="/tmp/model.ckpt",
 ):
-    """This function creates and trains a model."""
+    """
+
+    Args:
+        Data_train: tuple containing the training inputs and
+                    training labels, respectively
+        Data_valid:  tuple containing the validation inputs and
+                    validation labels, respectively
+        layers:  list containing the number of nodes in each layer of
+                the network
+        activations: list containing the activation functions used
+                    for each layer of the network
+        alpha: learning rate
+        beta1: weight for the first moment of Adam Optimization
+        beta2: weight for the second moment of Adam Optimization
+        epsilon: small number used to avoid division by zero
+        decay_rate: decay rate for inverse time decay of the learning rate
+        batch_size: number of data points that should be in a mini-batch
+        epochs: number of times the training should pass through the whole
+                dataset
+        save_path: path where the model should be saved to
+
+    Returns:  path where the model was saved
+    """
     nx = Data_train[0].shape[1]
     classes = Data_train[1].shape[1]
 

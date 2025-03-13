@@ -1,14 +1,16 @@
 #!/usr/bin/env python3
 """
-module with a function that calculates
-the positional encoding for a transformer
+Defines a function that calculates the positional encoding for a transformer
 """
+
+
 import numpy as np
 
 
 def get_angle(pos, i, dm):
     """
-    formulas for positional encoding:
+    Calculates the angles for the following formulas for positional encoding:
+
     PE(pos, 2i) = sin(pos / 10000^(2i / dm))
     PE(pos, 2i + 1) = cos(pos / 10000^(2i / dm))
     """
@@ -19,11 +21,15 @@ def get_angle(pos, i, dm):
 def positional_encoding(max_seq_len, dm):
     """
     Calculates the positional encoding for a transformer
-    max_seq_len [int]- maximum sequence length
-    dm: model depth
+
+    parameters:
+        max_seq_len [int]:
+            represents the maximum sequence length
+        dm: model depth
+
     returns:
-    [numpy.ndarray- shape (max_seq_len, dm)] - positional
-    encoding vectors
+        [numpy.ndarray of shape (max_seq_len, dm)]:
+            contains the positional encoding vectors
     """
     positional_encoding = np.zeros([max_seq_len, dm])
 

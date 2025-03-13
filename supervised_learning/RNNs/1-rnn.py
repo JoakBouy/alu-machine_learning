@@ -1,42 +1,38 @@
 #!/usr/bin/env python3
+'''
+    Script that defines a function rnn
+    that performs forward propagation for a simple RNN
+'''
 
-"""
-This module contains class RNNCell which represents
-a cell of a simple RNN"""
+
 import numpy as np
 
 
 def rnn(rnn_cell, X, h_0):
-    """forward propagation for a simple RNN
-    rnn_cell = instance of a RNNCell
-    X - data used - shape(t, m, i)
-        t - max time steps
-        m - batch size
-        i data dimensionality
-    h_0 - initial hidden state shape(m,h)
-        h - hidden state dimensionality
-    return H, Y
-        H - all hidden states
-        Y - all outputs"""
+    '''
+        Function that performs forward propagation for a simple RNN
+
+        parameters:
+            rnn_cell: an instance of RNNCell
+            X: data
+            h_0: initial hidden state
+
+        return:
+            H: all hidden states
+            Y: all outputs
+    '''
 
     t, m, i = X.shape
-    _, h = h_0.shape
-    o = rnn_cell.Wy.shape[1]
-
-    # initialize hidden state
-    H = np.zeros((t+1, m, h))
-
-    # initialize output
-    Y = np.zeros((t, m, o))
-
-    # initial hidden state
+    m, h = h_0.shape
+    H = np.zeros((t + 1, m, h))
     H[0] = h_0
-
     for step in range(t):
-        x_t = X[step]
-        h_prev = H[step]
-        h_next, y = rnn_cell.forward(h_prev, x_t)
+        h_next, y = rnn_cell.forward(H[step], X[step])
         H[step + 1] = h_next
-        Y[step] = y
-
-    return H, Y
+        if step == 0:
+            Y = y
+        else:
+            Y = np.concatenate((Y, y))
+    output_shape = Y.shape[-1]
+    Y = Y.reshape(t, m, output_shape)
+    return (H, Y)

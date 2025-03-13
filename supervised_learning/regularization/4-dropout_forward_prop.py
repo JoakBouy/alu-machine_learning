@@ -1,49 +1,36 @@
 #!/usr/bin/env python3
-"""
-Conducts forward propagation using Dropout:
-"""
+""" Forward Propagation with Dropout """
+
+
 import numpy as np
 
 
 def dropout_forward_prop(X, weights, L, keep_prob):
+    """ Forward Propagation with Dropout
+        X: (nx, m) input data
+          nx: number of input features
+          m: number of examples
+        weights: dictionary of weights and biases of the neural network
+        L: number of layers in the network
+        keep_prob: probability that a node will be kept
+        Returns: dictionary containing the outputs of each
+        layer and the dropout mask used on each layer
     """
-    a function that conducts forward propagation using dropout
-    :param X: a numpy.ndarray of shape (nx, m) containing the input data for
-    the network
-        nx is the number of input features
-        m is the number of data points
-    :param weights: a dictionary of the weights and biases of the neural
-    network
-    :param L: the number of layers in the network
-    :param keep_prob: the probability that a node will be kept
-    :return: a dictionary containing the outputs of each layer and the
-    dropout mask used on each layer (see example for format)
-    """
-    cache = {'A0': X}
-    # Hidden and output layer
-    for i in range(L):
-        # create keys to access weights(W), biases(b) and store in cache
-        key_w = 'W' + str(i + 1)
-        key_b = 'b' + str(i + 1)
-        key_cache = 'A' + str(i + 1)
-        key_cache_last = 'A' + str(i)
-        # store activation in cache
-        output_Z = np.matmul(weights[key_w], cache[
-            key_cache_last]) + weights[key_b]
-        if i == L - 1:
-            # Softmax
-            t = np.exp(output_Z)
-            output_A = np.exp(output_Z) / np.sum(t, axis=0,
-                                                 keepdims=True)
+    cache = {}
+    cache['A0'] = X
+    for i in range(1, L + 1):
+        W = weights['W' + str(i)]
+        b = weights['b' + str(i)]
+        A = cache['A' + str(i - 1)]
+        Z = np.matmul(W, A) + b
+        if i < L:
+            A = np.tanh(Z)
+            D = np.random.rand(A.shape[0], A.shape[1])
+            D = np.where(D < keep_prob, 1, 0)
+            A = np.multiply(A, D)
+            A = A / keep_prob
+            cache['D' + str(i)] = D
         else:
-            output_A = ((np.exp(output_Z) - np.exp(-output_Z)) / (
-                np.exp(output_Z) + np.exp(-output_Z)))
-            # dropout value is 0 if random number less than keep_prop
-            rand = np.random.rand(output_A.shape[0], output_A.shape[1])
-            dropout = (rand < keep_prob).astype(int)
-            # dropout of the neuron if multiply by 0
-            output_A = np.multiply(output_A, dropout)
-            output_A = output_A / keep_prob
-            cache['D{}'.format(i + 1)] = dropout
-        cache[key_cache] = output_A
+            A = np.exp(Z) / np.sum(np.exp(Z), axis=0, keepdims=True)
+        cache['A' + str(i)] = A
     return cache

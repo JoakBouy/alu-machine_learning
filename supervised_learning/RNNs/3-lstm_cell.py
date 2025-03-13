@@ -1,75 +1,64 @@
 #!/usr/bin/env python3
-
 """
-This module contains class LSTMCell which represents
-a LSTM unit"""
+    Script that defines a class LSTMCell
+    that represents an LSTM unit
+"""
+
+
 import numpy as np
 
 
 class LSTMCell:
-    """class GRUCell"""
+    """
+    Class LSTMCell that represents an LSTM unit
+
+    parameters:
+        i: dimensionality of the data
+        h: dimensionality of the hidden state
+        o: dimensionality of the outputs
+    """
+
     def __init__(self, i, h, o):
-        """class constructor
-        i - data dimensionality
-        h - hidden state dimensionality
-        o - outputs dimensionality
-        Wf, bf - weights and bias for forget gate
-        Wu, bu - weights and bias for update gate
-        Wc, bc - for the intermediate cell state
-        W0, bo - weights and bias for output gate
-        Wy, hy - weights and bias for output
+        """
+        Class constructor
         """
         self.Wf = np.random.normal(size=(i + h, h))
         self.Wu = np.random.normal(size=(i + h, h))
         self.Wc = np.random.normal(size=(i + h, h))
         self.Wo = np.random.normal(size=(i + h, h))
         self.Wy = np.random.normal(size=(h, o))
-
         self.bf = np.zeros((1, h))
         self.bu = np.zeros((1, h))
         self.bc = np.zeros((1, h))
         self.bo = np.zeros((1, h))
         self.by = np.zeros((1, o))
 
-    def forward(self, h_prev, c_prev, x_t):
-        """forward propagation for one time step
-        x_t - shape (m, i) contains data input
-        m - batch size for data
-        h_prev - shape(m,h) contains previous hidden state
-        c_prev - shape(m,h) contains previous cell state
-        h_next - next hidden state
-        c_next - next cell state
-        y - output of the cell"""
-
-        x_t_concat = np.concatenate((h_prev, x_t), axis=1)
-
-        # forget gate
-        f_t = self.sigmoid(np.dot(x_t_concat, self.Wf) + self.bf)
-
-        # update gate
-        u_t = self.sigmoid(np.dot(x_t_concat, self.Wu) + self.bu)
-
-        # concat hidden states
-        # r_h_concat = np.concatenate((r_t * h_prev, x_t), axis=1)
-        c_tilde = np.tanh(np.dot(x_t_concat, self.Wc) + self.bc)
-
-        # next cell state
-        c_next = f_t * c_prev + u_t * c_tilde
-
-        # next gates
-        o_t = self.sigmoid(np.dot(x_t_concat, self.Wo) + self.bo)
-
-        # next hidden state
-        h_next = o_t * np.tanh(c_next)
-
-        # output
-        y_lin = np.dot(h_next, self.Wy) + self.by
-
-        # output with softmax activation
-        y = np.exp(y_lin) / np.sum(np.exp(y_lin), axis=1, keepdims=True)
-
-        return h_next, c_next, y
-
     def sigmoid(self, x):
-        """Compute the sigmoid function."""
-        return 1 / (1 + np.exp(-x))
+        """
+        Performs the sigmoid function
+        """
+        sigmoid = 1 / (1 + np.exp(-x))
+        return sigmoid
+
+    def softmax(self, x):
+        """
+        Performs the softmax function
+        """
+        e_x = np.exp(x - np.max(x, axis=1, keepdims=True))
+        softmax = e_x / e_x.sum(axis=1, keepdims=True)
+        return softmax
+
+    def forward(self, h_prev, c_prev, x_t):
+        """
+        Function that performs forward propagation
+        """
+
+        concatenation = np.concatenate((h_prev, x_t), axis=1)
+        ft = self.sigmoid(np.matmul(concatenation, self.Wf) + self.bf)
+        ut = self.sigmoid(np.matmul(concatenation, self.Wu) + self.bu)
+        ct = np.tanh(np.matmul(concatenation, self.Wc) + self.bc)
+        c_next = ft * c_prev + ut * ct
+        ot = self.sigmoid(np.matmul(concatenation, self.Wo) + self.bo)
+        h_next = ot * np.tanh(c_next)
+        y = self.softmax(np.matmul(h_next, self.Wy) + self.by)
+        return h_next, c_next, y

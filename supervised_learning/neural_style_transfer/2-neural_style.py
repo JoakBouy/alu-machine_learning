@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
+"""
+Defines class NST that performs tasks for neural style transfer
+"""
 
-"""
-This module contains a class NST with functions that
-calculate gram matrices
-"""
+
 import numpy as np
 import tensorflow as tf
 

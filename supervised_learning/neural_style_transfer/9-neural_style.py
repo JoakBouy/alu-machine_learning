@@ -1,53 +1,107 @@
 #!/usr/bin/env python3
+"""
+Defines class NST that performs tasks for neural style transfer
+"""
 
-"""
-This module contains a class NST with functions that
-calculate style cost
-"""
+
 import numpy as np
 import tensorflow as tf
 
 
 class NST:
-    """class NST"""
+    """
+    Performs tasks for Neural Style Transfer
+
+    public class attributes:
+        style_layers = ['block1_conv1', 'block2_conv1', 'block3_conv1',
+                        'block4_conv1', 'block5_conv1']
+        content_layer = 'block5_conv2'
+
+    instance attributes:
+        style_image: preprocessed style image
+        content_image: preprocessed style image
+        alpha: weight for content cost
+        beta: weight for style cost
+        model: the Keras model used to calculate cost
+        gram_style_features: list of gram matrices from style layer outputs
+        content_feature: the content later output of the content image
+
+    class constructor:
+        def __init__(self, style_image, content_image, alpha=1e4, beta=1)
+
+    static methods:
+        def scale_image(image):
+            rescales an image so the pixel values are between 0 and 1
+                and the largest side is 512 pixels
+        def gram_matrix(input_layer):
+            calculates gram matrices
+
+    public instance methods:
+        def load_model(self):
+            creates model used to calculate cost from VGG19 Keras base model
+        def generate_features(self):
+            extracts the features used to calculate neural style cost
+        def layer_style_cost(self, style_output, gram_target):
+            calculates the style cost for a single layer
+        def style_cost(self, style_outputs):
+            calculates the style cost for generated image
+        def content_cost(self, content_output):
+            calculates the content cost for the generated image
+        def total cost(self, generated_image):
+            calculates the total cost for the generated image
+        def compute_grads(self, generated_image):
+            calculates the gradients for the generated image
+        def generate_image(self, iterations=1000, step=None, lr=0.01,
+            beta1=0.9, beta2=0.99):
+            generates the neural style transfered image
+    """
     style_layers = ['block1_conv1', 'block2_conv1', 'block3_conv1',
                     'block4_conv1', 'block5_conv1']
     content_layer = 'block5_conv2'
 
     def __init__(self, style_image, content_image, alpha=1e4, beta=1):
-        """class constructor
-        style_image - image used as style reference stored as numpy array
-        content_image - image used as content reference stored as numpy array
-        alpha - weight for content cost
-        beta - weight for style cost
-        model - the Keras model used to calculate cost
         """
-        # tensorflow executes eagerly
-        tf.enable_eager_execution()
+        Class constructor for Neural Style Transfer class
 
-        error = "style_image must be a numpy.ndarray with shape (h, w, 3)"
-        if not isinstance(style_image, np.ndarray):
-            raise TypeError(error)
-        if style_image.ndim != 3 or style_image.shape[2] != 3:
-            raise TypeError(error)
+        parameters:
+            style_image [numpy.ndarray with shape (h, w, 3)]:
+                image used as style reference
+            content_image [numpy.ndarray with shape (h, w, 3)]:
+                image used as content reference
+            alpha [float]: weight for content cost
+            beta [float]: weight for style cost
 
-        error = "content_image must be a numpy.ndarray with shape (h, w, 3)"
-        if not isinstance(content_image, np.ndarray):
-            raise TypeError(error)
-        if content_image.ndim != 3 or content_image.shape[2] != 3:
-            raise TypeError(error)
-
-        if not isinstance(alpha, (int, float)) or alpha < 0:
+        Raises TypeError if input are in incorrect format
+        Sets TensorFlow to execute eagerly
+        Sets instance attributes
+        """
+        if type(style_image) is not np.ndarray or \
+           len(style_image.shape) != 3:
+            raise TypeError(
+                "style_image must be a numpy.ndarray with shape (h, w, 3)")
+        if type(content_image) is not np.ndarray or \
+           len(content_image.shape) != 3:
+            raise TypeError(
+                "content_image must be a numpy.ndarray with shape (h, w, 3)")
+        style_h, style_w, style_c = style_image.shape
+        content_h, content_w, content_c = content_image.shape
+        if style_h <= 0 or style_w <= 0 or style_c != 3:
+            raise TypeError(
+                "style_image must be a numpy.ndarray with shape (h, w, 3)")
+        if content_h <= 0 or content_w <= 0 or content_c != 3:
+            raise TypeError(
+                "content_image must be a numpy.ndarray with shape (h, w, 3)")
+        if (type(alpha) is not float and type(alpha) is not int) or alpha < 0:
             raise TypeError("alpha must be a non-negative number")
-
-        if not isinstance(beta, (int, float)) or beta < 0:
+        if (type(beta) is not float and type(beta) is not int) or beta < 0:
             raise TypeError("beta must be a non-negative number")
+
+        tf.enable_eager_execution()
 
         self.style_image = self.scale_image(style_image)
         self.content_image = self.scale_image(content_image)
         self.alpha = alpha
         self.beta = beta
-        # load model
         self.load_model()
         self.generate_features()
 
